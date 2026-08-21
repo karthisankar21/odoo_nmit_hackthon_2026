@@ -1,0 +1,124 @@
+
+Sankara subramanian
+sankarasubramanian_44692
+Online
+﻿
+Sankara subramanian
+ — 
+8:42 PM
+Kumar Ganesan
+ — 
+8:42 PM
+Sankara subramanian
+ — 
+8:44 PM
+https://github.com/karthisankar21/odoo_nmit_hackthon_2026
+GitHub
+karthisankar21/odoo_nmit_hackthon_2026
+odoo_nmit_hackthon_2026. Contribute to karthisankar21/odoo_nmit_hackthon_2026 development by creating an account on GitHub.
+karthisankar21/odoo_nmit_hackthon_2026
+Kumar Ganesan
+ — 
+9:04 PM
+
+# =============================================================================
+# E-COMMERCE PROJECT .gitignore
+# Python Backend + PHP Frontend
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PYTHON BACKEND
+# -----------------------------------------------------------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Django / Flask specific
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+instance/
+.webassets-cache
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# dotenv / secrets
+.env
+.env.*
+!.env.example
+
+# mypy / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# pipenv / poetry
+Pipfile.lock
+poetry.lock
+
+# -----------------------------------------------------------------------------
+# PHP FRONTEND
+# -----------------------------------------------------------------------------
+
+# Composer dependencies
+vendor/
+composer.lock
+
+# Laravel specific (if used)
+/public/hot
+/public/storage
+/storage/*.key
+/storage/app/
+/storage/framework/
+/storage/logs/
+bootstrap/cache/
+.phpunit.result.cache
+
+# Symfony specific (if used)
+var/
+/public/bundles/
+symfony.lock
+
+# PHP CS Fixer
+.php_cs.cache
+.php-cs-fixer.cache
+
+
