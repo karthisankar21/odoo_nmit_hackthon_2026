@@ -98,4 +98,7 @@ symfony.lock
 .php_cs.cache
 .php-cs-fixer.cache
 
+**/.pytest_cache/
+.DS_Store
 
+dayflow-hrms-plan.md
