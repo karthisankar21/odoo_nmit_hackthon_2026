@@ -43,7 +43,7 @@ class Attendance(db.Model):
     # Both are nullable:
     #   check_in=None  → employee has not checked in yet
     #   check_out=None → employee has checked in but not yet checked out
-    check_in  = db.Column(db.Time, nullable=True)
+    check_in = db.Column(db.Time, nullable=True)
     check_out = db.Column(db.Time, nullable=True)
 
     # ── Attendance status ─────────────────────────────────────────────────────
@@ -56,10 +56,7 @@ class Attendance(db.Model):
     # ── Table-level constraints ───────────────────────────────────────────────
     # One record per employee per day — enforced at database level
     __table_args__ = (
-        db.UniqueConstraint(
-            "employee_id", "date",
-            name="uq_attendance_employee_date"
-        ),
+        db.UniqueConstraint("employee_id", "date", name="uq_attendance_employee_date"),
     )
 
     # ── Relationships ─────────────────────────────────────────────────────────
@@ -73,12 +70,17 @@ class Attendance(db.Model):
         Times are formatted as HH:MM strings; date as YYYY-MM-DD.
         """
         return {
-            "id":          self.id,
+            "id": self.id,
             "employee_id": self.employee_id,
-            "date":        self.date.isoformat()      if self.date      else None,
-            "check_in":    self.check_in.strftime("%H:%M")  if self.check_in  else None,
-            "check_out":   self.check_out.strftime("%H:%M") if self.check_out else None,
-            "status":      self.status,
+            "employee_name": (
+                self.employee.user.name
+                if self.employee and self.employee.user
+                else None
+            ),
+            "date": self.date.isoformat() if self.date else None,
+            "check_in": self.check_in.strftime("%H:%M") if self.check_in else None,
+            "check_out": self.check_out.strftime("%H:%M") if self.check_out else None,
+            "status": self.status,
         }
 
     def __repr__(self):
