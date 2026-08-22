@@ -15,8 +15,20 @@
 -- =============================================================================
 
 -- ── Wait safety: only seed if tables exist and are empty ─────────────────────
+-- The users table is created by Flask-Migrate AFTER the container starts.
+-- This seed file runs at container init time, so the table may not exist yet.
+-- We check pg_tables first; if the table isn't there yet we skip silently.
 DO $$
 BEGIN
+
+  -- Guard: skip entirely if the users table hasn't been created yet
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables
+    WHERE schemaname = 'public' AND tablename = 'users'
+  ) THEN
+    RAISE NOTICE 'users table does not exist yet — skipping seed. Run flask db upgrade then re-seed manually.';
+    RETURN;
+  END IF;
 
   -- Only run seed if users table is empty (prevents duplicate seed on restart)
   IF NOT EXISTS (SELECT 1 FROM users LIMIT 1) THEN

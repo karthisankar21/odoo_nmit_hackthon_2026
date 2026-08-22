@@ -19,6 +19,11 @@
         </div>
     @endif
 
+    {{-- ── Register link ───────────────────────────────────────────────────── --}}
+    <p class="text-muted mb-3" style="font-size:0.82rem;">
+        Don't have an account? <a href="{{ route('register') }}">Create one</a>
+    </p>
+
     {{-- ── Login form ──────────────────────────────────────────────────────── --}}
     <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
         @csrf
