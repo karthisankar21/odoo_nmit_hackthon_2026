@@ -35,7 +35,7 @@ class ProfileController extends Controller
             return back()->with('error', $res['error']);
         }
 
-        $employee = $res['data']['employee'] ?? [];
+        $employee = $res['data'] ?? [];
 
         return view('employee.profile', compact('employee'));
     }

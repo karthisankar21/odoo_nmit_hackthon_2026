@@ -19,41 +19,41 @@
     </div>
 
     @if(empty($employees))
-        <p class="text-muted">No employees found.</p>
+    <p class="text-muted">No employees found.</p>
     @else
-        <div class="table-responsive">
-            <table class="table table-sm table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Job Title</th>
-                        <th>Department</th>
-                        <th>Phone</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($employees as $emp)
-                        <tr>
-                            <td class="text-muted">{{ $emp['user_id'] ?? '—' }}</td>
-                            <td class="fw-semibold">{{ $emp['name'] ?? '—' }}</td>
-                            <td class="text-muted">{{ $emp['email'] ?? '—' }}</td>
-                            <td>{{ $emp['job_title'] ?? '—' }}</td>
-                            <td>{{ $emp['department'] ?? '—' }}</td>
-                            <td class="text-muted">{{ $emp['phone'] ?? '—' }}</td>
-                            <td>
-                                <a href="{{ route('admin.employees.show', $emp['user_id']) }}"
-                                   class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Job Title</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($employees as $emp)
+                <tr>
+                    <td class="text-muted">{{ $emp['user_id'] ?? '—' }}</td>
+                    <td class="fw-semibold">{{ $emp['name'] ?? '—' }}</td>
+                    <td class="text-muted">{{ $emp['email'] ?? '—' }}</td>
+                    <td>{{ $emp['job_title'] ?? '—' }}</td>
+                    <td>{{ $emp['department'] ?? '—' }}</td>
+                    <td class="text-muted">{{ $emp['phone'] ?? '—' }}</td>
+                    <td>
+                        <a href="{{ route('admin.employees.show', $emp['id']) }}"
+                            class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
     @endif
 </div>
 

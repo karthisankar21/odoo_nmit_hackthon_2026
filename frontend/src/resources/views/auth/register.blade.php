@@ -10,11 +10,6 @@
 
 @section('content')
 
-<div class="text-center mb-4">
-    <div style="font-size:1.6rem;font-weight:700;color:#1f2328;letter-spacing:-0.5px;">Dayflow</div>
-    <div style="font-size:0.8rem;color:#57606a;margin-top:2px;">HR Management System</div>
-</div>
-
 <h5 class="fw-semibold mb-1" style="font-size:1rem;">Create your account</h5>
 <p class="text-muted mb-4" style="font-size:0.82rem;">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
 

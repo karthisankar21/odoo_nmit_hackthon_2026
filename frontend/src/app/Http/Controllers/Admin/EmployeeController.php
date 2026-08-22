@@ -60,7 +60,7 @@ class EmployeeController extends Controller
             return redirect()->route('admin.employees')->with('error', $res['error']);
         }
 
-        $employee = $res['data']['employee'] ?? [];
+        $employee = $res['data'] ?? [];
 
         return view('admin.employees.show', compact('employee', 'id'));
     }
