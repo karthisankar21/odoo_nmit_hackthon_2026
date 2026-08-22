@@ -107,6 +107,12 @@ class ApiClient
             'body'  => $body,
         ]);
 
+        // 401 — JWT expired or invalid; clear session so middleware redirects to login
+        if ($status === 401) {
+            Log::warning("ApiClient: 401 on {$path} — clearing session and forcing re-login");
+            session()->flush();
+        }
+
         return [
             'success' => false,
             'error'   => $error,
