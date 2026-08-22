@@ -34,7 +34,8 @@ class LeaveController extends Controller
             return back()->with('error', $res['error']);
         }
 
-        $leaves = $res['data']['leaves'] ?? [];
+        // Flask returns key "leave_requests" (not "leaves")
+        $leaves = $res['data']['leave_requests'] ?? [];
 
         return view('admin.leave', compact('leaves'));
     }

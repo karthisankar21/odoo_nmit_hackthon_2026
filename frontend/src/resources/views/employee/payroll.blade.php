@@ -10,10 +10,18 @@
 
 @section('content')
 
+{{-- API error (backend unreachable or unexpected error) --}}
+@if(!empty($apiError))
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Could not load payroll data: {{ $apiError }}
+    </div>
+@endif
+
 @if(empty($payrolls))
     <div class="stat-card text-center py-5">
         <i class="bi bi-receipt fs-1 text-muted"></i>
-        <p class="text-muted mt-3">No payroll records available yet.</p>
+        <p class="text-muted mt-3">No payroll records available yet. Contact HR.</p>
     </div>
 @else
 

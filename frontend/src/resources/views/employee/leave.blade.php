@@ -10,6 +10,14 @@
 
 @section('content')
 
+{{-- API error (backend unreachable) --}}
+@if(!empty($apiError))
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Could not load leave history: {{ $apiError }}
+    </div>
+@endif
+
 <div class="row g-4">
 
     {{-- ── Apply Leave form ────────────────────────────────────────────────── --}}
@@ -28,10 +36,9 @@
                     <select class="form-select @error('leave_type') is-invalid @enderror"
                             id="leave_type" name="leave_type">
                         <option value="">— Select —</option>
-                        <option value="annual"  {{ old('leave_type') === 'annual'  ? 'selected' : '' }}>Annual</option>
-                        <option value="sick"    {{ old('leave_type') === 'sick'    ? 'selected' : '' }}>Sick</option>
-                        <option value="unpaid"  {{ old('leave_type') === 'unpaid'  ? 'selected' : '' }}>Unpaid</option>
-                        <option value="other"   {{ old('leave_type') === 'other'   ? 'selected' : '' }}>Other</option>
+                        <option value="paid"   {{ old('leave_type') === 'paid'   ? 'selected' : '' }}>Paid / Annual</option>
+                        <option value="sick"   {{ old('leave_type') === 'sick'   ? 'selected' : '' }}>Sick</option>
+                        <option value="unpaid" {{ old('leave_type') === 'unpaid' ? 'selected' : '' }}>Unpaid</option>
                     </select>
                     @error('leave_type')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -108,7 +115,7 @@
                                     <td>{{ $leave['start_date'] ?? '—' }}</td>
                                     <td>{{ $leave['end_date'] ?? '—' }}</td>
                                     <td class="text-muted" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                        {{ $leave['reason'] ?? '—' }}
+                                        {{ $leave['remarks'] ?? '—' }}
                                     </td>
                                     <td>
                                         <span class="badge badge-{{ $leave['status'] ?? 'pending' }}">
