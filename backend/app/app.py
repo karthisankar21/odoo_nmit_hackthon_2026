@@ -142,14 +142,14 @@ def health():
 from blueprints.auth       import auth_bp         # Sub-Task 3 ✅
 from blueprints.employees  import employees_bp    # Sub-Task 4 ✅
 from blueprints.attendance import attendance_bp   # Sub-Task 5 ✅
-# from blueprints.leave      import leave_bp       # Sub-Task 6
+from blueprints.leave      import leave_bp        # Sub-Task 6 ✅
 # from blueprints.payroll    import payroll_bp     # Sub-Task 7
 # from blueprints.analytics  import analytics_bp  # Sub-Task 8
 
 app.register_blueprint(auth_bp,       url_prefix="/api/auth")
 app.register_blueprint(employees_bp,  url_prefix="/api/employees")
 app.register_blueprint(attendance_bp, url_prefix="/api/attendance")
-# app.register_blueprint(leave_bp,      url_prefix="/api/leave")
+app.register_blueprint(leave_bp,      url_prefix="/api/leave")
 # app.register_blueprint(payroll_bp,    url_prefix="/api/payroll")
 # app.register_blueprint(analytics_bp,  url_prefix="/api/analytics")
 
