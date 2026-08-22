@@ -119,8 +119,25 @@ def summary():
     # Extract individual counts — default to 0 if no records for that status
     present_today  = attendance_by_status.get("present",  0)
     on_leave_today = attendance_by_status.get("leave",    0)
-    absent_today   = attendance_by_status.get("absent",   0)
-    half_day_today = attendance_by_status.get("half-day", 0)
+    half_day_today = attendance_by_status.get("half-day", 0) or attendance_by_status.get("half_day", 0)
+
+    # absent_today = employees who have no attendance record at all today
+    # (not just those with an explicit 'absent' row, which is rarely written)
+    try:
+        employees_checked_in_today = (
+            db.session.query(Attendance.employee_id)
+            .filter(Attendance.date == today)
+            .distinct()
+            .count()
+        )
+        absent_today = max(total_employees - employees_checked_in_today, 0)
+        logger.debug(
+            "analytics: employees_checked_in=%s total=%s absent_today=%s",
+            employees_checked_in_today, total_employees, absent_today
+        )
+    except Exception as exc:
+        logger.error("analytics: failed to compute absent_today — %s", exc, exc_info=True)
+        absent_today = 0
 
     # ==========================================================================
     # QUERY 3: Pending leave requests count
