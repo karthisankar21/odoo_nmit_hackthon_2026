@@ -36,7 +36,11 @@ class PayrollController extends Controller
 
         $payrolls = $res['data']['payrolls'] ?? [];
 
-        return view('admin.payroll', compact('payrolls'));
+        // Also fetch employee list to populate the payroll form dropdown
+        $empRes    = ApiClient::get('/employees');
+        $employees = $empRes['success'] ? ($empRes['data']['employees'] ?? []) : [];
+
+        return view('admin.payroll', compact('payrolls', 'employees'));
     }
 
     // =========================================================================

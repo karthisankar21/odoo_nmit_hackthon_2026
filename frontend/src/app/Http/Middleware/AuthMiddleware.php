@@ -33,9 +33,11 @@ class AuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Check for JWT token in session
+        // Session is flushed by ApiClient when a 401 is received (expired token)
         if (!session('token')) {
-            Log::warning('AuthMiddleware: unauthenticated access to ' . $request->path() . ' — redirecting to login');
-            return redirect()->route('login');
+            Log::warning('AuthMiddleware: no token for path=' . $request->path() . ' — redirecting to login');
+            return redirect()->route('login')
+                ->with('error', 'Your session has expired. Please sign in again.');
         }
 
         Log::debug('AuthMiddleware: authenticated user_id=' . session('user_id') . ' accessing ' . $request->path());

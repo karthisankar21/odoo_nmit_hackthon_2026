@@ -11,6 +11,7 @@
 @section('content')
 
 {{-- ── Payroll records table ───────────────────────────────────────────────── --}}
+{{-- NOTE: $employees is passed from the controller for the payroll form dropdown --}}
 <div class="stat-card mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-semibold mb-0">
@@ -68,11 +69,17 @@
         @csrf
 
         <div class="row g-3">
-            {{-- Employee ID --}}
-            <div class="col-md-2">
-                <label class="form-label fw-semibold" for="employee_id">Employee ID</label>
-                <input type="number" class="form-control" id="employee_id" name="employee_id"
-                       placeholder="e.g. 2" min="1" required>
+            {{-- Employee — dropdown so admin doesn't have to guess the ID --}}
+            <div class="col-md-3">
+                <label class="form-label fw-semibold" for="employee_id">Employee</label>
+                <select class="form-select" id="employee_id" name="employee_id" required>
+                    <option value="">— Select Employee —</option>
+                    @foreach($employees ?? [] as $emp)
+                        <option value="{{ $emp['id'] }}">
+                            #{{ $emp['id'] }} — {{ $emp['name'] ?? $emp['email'] ?? 'Unknown' }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             {{-- Basic Salary --}}
