@@ -119,13 +119,14 @@ def get_my_payroll():
 
     if not payroll:
         logger.warning("get_my_payroll: no payroll records found for employee_id=%s", employee_id)
-        return jsonify({"error": "No payroll record found — contact HR"}), 404
+        # Return empty list instead of 404 — frontend shows "no records yet" state
+        return jsonify({"payrolls": [], "total": 0}), 200
 
     logger.debug(
         "get_my_payroll: returning payroll id=%s %s/%s for employee_id=%s",
         payroll.id, payroll.month, payroll.year, employee_id
     )
-    return jsonify(payroll.to_dict()), 200
+    return jsonify({"payrolls": [payroll.to_dict()], "total": 1}), 200
 
 
 # =============================================================================
@@ -182,8 +183,8 @@ def list_payroll():
 
     logger.debug("list_payroll: returning %d records", len(records))
     return jsonify({
-        "payroll": [r.to_dict() for r in records],
-        "total":   len(records),
+        "payrolls": [r.to_dict() for r in records],
+        "total":    len(records),
     }), 200
 
 

@@ -29,8 +29,9 @@ class PayrollController extends Controller
         $res = ApiClient::get('/payroll/me');
 
         if (!$res['success']) {
-            Log::warning('EmpPayroll: failed to load payroll', ['error' => $res['error']]);
-            return back()->with('error', $res['error']);
+            // Non-fatal: show empty state with inline warning rather than redirecting
+            Log::warning('EmpPayroll: failed to load payroll — ' . ($res['error'] ?? ''));
+            return view('employee.payroll', ['payrolls' => [], 'apiError' => $res['error']]);
         }
 
         $payrolls = $res['data']['payrolls'] ?? [];

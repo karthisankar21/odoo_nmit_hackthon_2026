@@ -25,7 +25,7 @@ class DashboardController extends Controller
      *   - total_employees
      *   - today_attendance  { present, absent, half_day, leave, total }
      *   - pending_leaves
-     *   - leave_by_type     { annual, sick, unpaid, other }
+     *   - leave_by_type     { paid, sick, unpaid, other }
      *   - dept_headcount    [ { department, count } ]
      *
      * @return \Illuminate\View\View

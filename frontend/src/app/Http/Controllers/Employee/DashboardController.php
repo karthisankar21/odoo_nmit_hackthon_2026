@@ -56,7 +56,8 @@ class DashboardController extends Controller
         $recentLeaves  = [];
 
         if ($leaveRes['success']) {
-            $allLeaves = $leaveRes['data']['leaves'] ?? [];
+            // Flask returns key "leave_requests" (not "leaves")
+            $allLeaves = $leaveRes['data']['leave_requests'] ?? [];
             foreach ($allLeaves as $l) {
                 if (($l['status'] ?? '') === 'pending') {
                     $pendingLeaves++;
