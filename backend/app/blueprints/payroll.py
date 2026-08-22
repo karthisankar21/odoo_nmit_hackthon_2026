@@ -22,7 +22,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from extensions import db
-from models.payroll import Payroll
+from backend.app.blueprints.payroll import Payroll
 from models.employee import Employee
 from utils.auth_helpers import require_role
 
