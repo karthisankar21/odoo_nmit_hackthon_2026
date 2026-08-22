@@ -43,11 +43,25 @@ class DashboardController extends Controller
         if ($res['success']) {
             $summary = $res['data'];
 
+            $summary['today_attendance'] = [
+                'present'  => $summary['present_today'] ?? 0,
+                'absent'   => $summary['absent_today'] ?? 0,
+                'leave'    => $summary['on_leave_today'] ?? 0,
+                'half_day' => $summary['half_day_today'] ?? 0,
+                'total'    => array_sum([
+                    $summary['present_today'] ?? 0,
+                    $summary['absent_today'] ?? 0,
+                    $summary['on_leave_today'] ?? 0,
+                    $summary['half_day_today'] ?? 0,
+                ]),
+            ];
+            $summary['pending_leaves'] = $summary['pending_leave_requests'] ?? 0;
+
             // Build chart-ready arrays for department headcount
-            foreach ($summary['dept_headcount'] ?? [] as $row) {
+            foreach ($summary['department_headcount'] ?? [] as $department => $count) {
                 $deptData[] = [
-                    'label' => $row['department'] ?? 'Unknown',
-                    'value' => $row['count'] ?? 0,
+                    'label' => $department,
+                    'value' => $count,
                 ];
             }
 

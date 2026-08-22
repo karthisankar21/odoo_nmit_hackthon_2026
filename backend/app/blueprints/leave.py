@@ -47,6 +47,7 @@ VALID_LEAVE_TYPES = {"paid", "sick", "unpaid"}
 # HELPER: get_employee_id_for_user
 # =============================================================================
 
+
 def get_employee_id_for_user(user_id):
     """
     Returns the Employee.id for the given user_id, or None if not found.
@@ -65,6 +66,7 @@ def get_employee_id_for_user(user_id):
 # HELPER: upsert_attendance_leave
 # =============================================================================
 
+
 def upsert_attendance_leave(employee_id, target_date):
     """
     Creates or updates the Attendance row for a specific employee + date,
@@ -79,8 +81,7 @@ def upsert_attendance_leave(employee_id, target_date):
         target_date (date): the calendar date to mark as leave
     """
     existing = Attendance.query.filter_by(
-        employee_id=employee_id,
-        date=target_date
+        employee_id=employee_id, date=target_date
     ).first()
 
     if existing:
@@ -88,7 +89,8 @@ def upsert_attendance_leave(employee_id, target_date):
         existing.status = "leave"
         logger.debug(
             "upsert_attendance_leave: updated existing row — employee_id=%s date=%s",
-            employee_id, target_date
+            employee_id,
+            target_date,
         )
     else:
         # No row yet — create one with status='leave' and no check-in/out
@@ -100,13 +102,15 @@ def upsert_attendance_leave(employee_id, target_date):
         db.session.add(new_row)
         logger.debug(
             "upsert_attendance_leave: created new row — employee_id=%s date=%s",
-            employee_id, target_date
+            employee_id,
+            target_date,
         )
 
 
 # =============================================================================
 # ROUTE: POST /api/leave
 # =============================================================================
+
 
 @leave_bp.route("", methods=["POST"])
 @jwt_required()
@@ -139,17 +143,21 @@ def apply_leave():
         return jsonify({"error": "Request body is required"}), 400
 
     leave_type = data.get("leave_type", "").strip().lower()
-    start_str  = data.get("start_date", "").strip()
-    end_str    = data.get("end_date",   "").strip()
-    remarks    = data.get("remarks",    "").strip() or None
+    start_str = data.get("start_date", "").strip()
+    end_str = data.get("end_date", "").strip()
+    remarks = (data.get("remarks") or "").strip() or None
 
     # ── Step 2: Validate leave type ───────────────────────────────────────────
     if leave_type not in VALID_LEAVE_TYPES:
         logger.warning(
-            "apply_leave: invalid leave_type='%s' from user_id=%s",
-            leave_type, user_id
+            "apply_leave: invalid leave_type='%s' from user_id=%s", leave_type, user_id
         )
-        return jsonify({"error": f"leave_type must be one of: {', '.join(VALID_LEAVE_TYPES)}"}), 400
+        return (
+            jsonify(
+                {"error": f"leave_type must be one of: {', '.join(VALID_LEAVE_TYPES)}"}
+            ),
+            400,
+        )
 
     # ── Step 3: Validate and parse dates ──────────────────────────────────────
     if not start_str or not end_str:
@@ -158,11 +166,13 @@ def apply_leave():
 
     try:
         start_date = date.fromisoformat(start_str)
-        end_date   = date.fromisoformat(end_str)
+        end_date = date.fromisoformat(end_str)
     except ValueError:
         logger.warning(
             "apply_leave: invalid date format start='%s' end='%s' from user_id=%s",
-            start_str, end_str, user_id
+            start_str,
+            end_str,
+            user_id,
         )
         return jsonify({"error": "Invalid date format — use YYYY-MM-DD"}), 400
 
@@ -170,7 +180,9 @@ def apply_leave():
     if end_date < start_date:
         logger.warning(
             "apply_leave: end_date %s < start_date %s from user_id=%s",
-            end_date, start_date, user_id
+            end_date,
+            start_date,
+            user_id,
         )
         return jsonify({"error": "end_date must be on or after start_date"}), 400
 
@@ -178,7 +190,9 @@ def apply_leave():
     try:
         employee_id = get_employee_id_for_user(user_id)
     except Exception as exc:
-        logger.error("apply_leave: DB error resolving employee — %s", exc, exc_info=True)
+        logger.error(
+            "apply_leave: DB error resolving employee — %s", exc, exc_info=True
+        )
         return jsonify({"error": "Internal server error"}), 500
 
     if not employee_id:
@@ -187,7 +201,10 @@ def apply_leave():
 
     logger.debug(
         "apply_leave: employee_id=%s type=%s %s→%s",
-        employee_id, leave_type, start_date, end_date
+        employee_id,
+        leave_type,
+        start_date,
+        end_date,
     )
 
     # ── Step 6: Create leave request ──────────────────────────────────────────
@@ -216,6 +233,7 @@ def apply_leave():
 # =============================================================================
 # ROUTE: GET /api/leave/me
 # =============================================================================
+
 
 @leave_bp.route("/me", methods=["GET"])
 @jwt_required()
@@ -265,17 +283,24 @@ def get_my_leave():
 
     logger.debug(
         "get_my_leave: returning %d records for employee_id=%s",
-        len(records), employee_id
+        len(records),
+        employee_id,
     )
-    return jsonify({
-        "leave_requests": [r.to_dict() for r in records],
-        "total":          len(records),
-    }), 200
+    return (
+        jsonify(
+            {
+                "leave_requests": [r.to_dict() for r in records],
+                "total": len(records),
+            }
+        ),
+        200,
+    )
 
 
 # =============================================================================
 # ROUTE: GET /api/leave  (admin only)
 # =============================================================================
+
 
 @leave_bp.route("", methods=["GET"])
 @jwt_required()
@@ -322,15 +347,21 @@ def list_leave():
         return jsonify({"error": "Internal server error"}), 500
 
     logger.debug("list_leave: returning %d records", len(records))
-    return jsonify({
-        "leave_requests": [r.to_dict() for r in records],
-        "total":          len(records),
-    }), 200
+    return (
+        jsonify(
+            {
+                "leave_requests": [r.to_dict() for r in records],
+                "total": len(records),
+            }
+        ),
+        200,
+    )
 
 
 # =============================================================================
 # ROUTE: PUT /api/leave/<id>/approve  (admin only)
 # =============================================================================
+
 
 @leave_bp.route("/<int:leave_id>/approve", methods=["PUT"])
 @jwt_required()
@@ -362,13 +393,17 @@ def approve_leave(leave_id):
         500 — database error
     """
     admin_user_id = int(get_jwt_identity())
-    logger.debug("PUT /api/leave/%s/approve — by admin user_id=%s", leave_id, admin_user_id)
+    logger.debug(
+        "PUT /api/leave/%s/approve — by admin user_id=%s", leave_id, admin_user_id
+    )
 
     # ── Step 1: Fetch leave request ───────────────────────────────────────────
     try:
         leave_req = LeaveRequest.query.get(leave_id)
     except Exception as exc:
-        logger.error("approve_leave: DB error fetching id=%s — %s", leave_id, exc, exc_info=True)
+        logger.error(
+            "approve_leave: DB error fetching id=%s — %s", leave_id, exc, exc_info=True
+        )
         return jsonify({"error": "Internal server error"}), 500
 
     if not leave_req:
@@ -379,20 +414,29 @@ def approve_leave(leave_id):
     if leave_req.status != "pending":
         logger.warning(
             "approve_leave: leave_id=%s is already '%s' — cannot approve",
-            leave_id, leave_req.status
+            leave_id,
+            leave_req.status,
         )
-        return jsonify({
-            "error": f"Leave request is already '{leave_req.status}' — only pending requests can be approved"
-        }), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Leave request is already '{leave_req.status}' — only pending requests can be approved"
+                }
+            ),
+            400,
+        )
 
     # ── Step 3: Update leave request ──────────────────────────────────────────
     data = request.get_json() or {}
-    leave_req.status        = "approved"
+    leave_req.status = "approved"
     leave_req.admin_comment = data.get("admin_comment", "").strip() or None
 
     logger.debug(
         "approve_leave: approving leave_id=%s employee_id=%s %s→%s",
-        leave_id, leave_req.employee_id, leave_req.start_date, leave_req.end_date
+        leave_id,
+        leave_req.employee_id,
+        leave_req.start_date,
+        leave_req.end_date,
     )
 
     # ── Step 4: Mark attendance as 'leave' for each day in range ─────────────
@@ -407,7 +451,8 @@ def approve_leave(leave_id):
 
     logger.debug(
         "approve_leave: marked %d attendance days as 'leave' for employee_id=%s",
-        days_marked, leave_req.employee_id
+        days_marked,
+        leave_req.employee_id,
     )
 
     # ── Step 5: Commit all changes atomically ─────────────────────────────────
@@ -416,7 +461,10 @@ def approve_leave(leave_id):
     except Exception as exc:
         db.session.rollback()
         logger.error(
-            "approve_leave: commit failed for leave_id=%s — %s", leave_id, exc, exc_info=True
+            "approve_leave: commit failed for leave_id=%s — %s",
+            leave_id,
+            exc,
+            exc_info=True,
         )
         return jsonify({"error": "Internal server error"}), 500
 
@@ -427,6 +475,7 @@ def approve_leave(leave_id):
 # =============================================================================
 # ROUTE: PUT /api/leave/<id>/reject  (admin only)
 # =============================================================================
+
 
 @leave_bp.route("/<int:leave_id>/reject", methods=["PUT"])
 @jwt_required()
@@ -456,13 +505,17 @@ def reject_leave(leave_id):
         500 — database error
     """
     admin_user_id = int(get_jwt_identity())
-    logger.debug("PUT /api/leave/%s/reject — by admin user_id=%s", leave_id, admin_user_id)
+    logger.debug(
+        "PUT /api/leave/%s/reject — by admin user_id=%s", leave_id, admin_user_id
+    )
 
     # ── Step 1: Fetch leave request ───────────────────────────────────────────
     try:
         leave_req = LeaveRequest.query.get(leave_id)
     except Exception as exc:
-        logger.error("reject_leave: DB error fetching id=%s — %s", leave_id, exc, exc_info=True)
+        logger.error(
+            "reject_leave: DB error fetching id=%s — %s", leave_id, exc, exc_info=True
+        )
         return jsonify({"error": "Internal server error"}), 500
 
     if not leave_req:
@@ -473,20 +526,27 @@ def reject_leave(leave_id):
     if leave_req.status != "pending":
         logger.warning(
             "reject_leave: leave_id=%s is already '%s' — cannot reject",
-            leave_id, leave_req.status
+            leave_id,
+            leave_req.status,
         )
-        return jsonify({
-            "error": f"Leave request is already '{leave_req.status}' — only pending requests can be rejected"
-        }), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Leave request is already '{leave_req.status}' — only pending requests can be rejected"
+                }
+            ),
+            400,
+        )
 
     # ── Step 3: Update leave request ──────────────────────────────────────────
     data = request.get_json() or {}
-    leave_req.status        = "rejected"
+    leave_req.status = "rejected"
     leave_req.admin_comment = data.get("admin_comment", "").strip() or None
 
     logger.debug(
         "reject_leave: rejecting leave_id=%s employee_id=%s",
-        leave_id, leave_req.employee_id
+        leave_id,
+        leave_req.employee_id,
     )
 
     # ── Step 4: Commit ────────────────────────────────────────────────────────
@@ -496,7 +556,10 @@ def reject_leave(leave_id):
     except Exception as exc:
         db.session.rollback()
         logger.error(
-            "reject_leave: commit failed for leave_id=%s — %s", leave_id, exc, exc_info=True
+            "reject_leave: commit failed for leave_id=%s — %s",
+            leave_id,
+            exc,
+            exc_info=True,
         )
         return jsonify({"error": "Internal server error"}), 500
 
