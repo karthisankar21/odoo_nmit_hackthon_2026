@@ -1,4 +1,12 @@
 <?php
+// =============================================================================
+// bootstrap/app.php
+// -----------------------------------------------------------------------------
+// Laravel 11 application bootstrap.
+// Registers custom middleware aliases used in routes/web.php:
+//   auth.custom  → AuthMiddleware  (checks JWT token in session)
+//   role         → RoleMiddleware  (checks user role in session)
+// =============================================================================
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -12,7 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // ── Register custom middleware aliases ────────────────────────────────
+        // 'auth.custom' → checks session('token') exists
+        // 'role'        → checks session('role') matches required role
+        $middleware->alias([
+            'auth.custom' => \App\Http\Middleware\AuthMiddleware::class,
+            'role'        => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
