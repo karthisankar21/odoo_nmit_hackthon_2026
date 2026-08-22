@@ -419,3 +419,6 @@ def get_employee_attendance(employee_id):
         "attendance": [r.to_dict() for r in records],
         "total":      len(records),
     }), 200
+
+
+
