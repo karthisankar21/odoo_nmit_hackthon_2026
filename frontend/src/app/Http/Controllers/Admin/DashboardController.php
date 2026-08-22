@@ -41,27 +41,43 @@ class DashboardController extends Controller
         $leaveTypeData = [];
 
         if ($res['success']) {
-            $summary = $res['data'];
+            $raw = $res['data'];
 
-            $summary['today_attendance'] = [
-                'present'  => $summary['present_today'] ?? 0,
-                'absent'   => $summary['absent_today'] ?? 0,
-                'leave'    => $summary['on_leave_today'] ?? 0,
-                'half_day' => $summary['half_day_today'] ?? 0,
-                'total'    => array_sum([
-                    $summary['present_today'] ?? 0,
-                    $summary['absent_today'] ?? 0,
-                    $summary['on_leave_today'] ?? 0,
-                    $summary['half_day_today'] ?? 0,
-                ]),
+            // ── Normalise flat API keys → nested structure the view expects ──────
+            // Flask returns: present_today, absent_today, on_leave_today,
+            //                half_day_today, pending_leave_requests,
+            //                department_headcount (object), leave_by_type (object)
+            // View expects:  today_attendance{present,absent,leave,half_day,total},
+            //                pending_leaves, dept_headcount[{department,count}]
+
+            $present  = $raw['present_today']      ?? 0;
+            $absent   = $raw['absent_today']        ?? 0;
+            $onLeave  = $raw['on_leave_today']      ?? 0;
+            $halfDay  = $raw['half_day_today']      ?? 0;
+
+            $summary = [
+                'total_employees'  => $raw['total_employees'] ?? 0,
+                'pending_leaves'   => $raw['pending_leave_requests'] ?? 0,
+                'leave_by_type'    => $raw['leave_by_type'] ?? [],
+                'today_attendance' => [
+                    'present'  => $present,
+                    'absent'   => $absent,
+                    'leave'    => $onLeave,
+                    'half_day' => $halfDay,
+                    'total'    => max($present + $absent + $onLeave + $halfDay, 1),
+                ],
+                // dept_headcount comes as {"HR":1,"Tech":2} — convert to [{department,count}]
+                'dept_headcount'   => collect($raw['department_headcount'] ?? [])
+                    ->map(fn($count, $dept) => ['department' => $dept, 'count' => $count])
+                    ->values()
+                    ->all(),
             ];
-            $summary['pending_leaves'] = $summary['pending_leave_requests'] ?? 0;
 
             // Build chart-ready arrays for department headcount
-            foreach ($summary['department_headcount'] ?? [] as $department => $count) {
+            foreach ($summary['dept_headcount'] as $row) {
                 $deptData[] = [
-                    'label' => $department,
-                    'value' => $count,
+                    'label' => $row['department'] ?? 'Unknown',
+                    'value' => $row['count'] ?? 0,
                 ];
             }
 
