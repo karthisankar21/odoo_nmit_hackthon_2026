@@ -7,33 +7,36 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set Python environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    FLASK_APP=app.py
+    FLASK_APP=app.py \
+    VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
 # ─── Install System Dependencies ──────────────────────────────────────────────
+# python3.12 ships built-in with Ubuntu 24.04 — no PPA needed
+# NO python3-pip, NO python3-cryptography — keep system Python packages out
 RUN apt-get update && apt-get install -y \
-        software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get update && apt-get install -y \
-        python3.11 \
-        python3.11-dev \
-        python3.11-distutils \
-        python3-pip \
+        python3.12 \
+        python3.12-dev \
+        python3.12-venv \
         libpq-dev \
         gcc \
         curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ─── Symlink python3.11 → python3 → python ───────────────────────────────────
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
-    && update-alternatives --install /usr/bin/python  python  /usr/bin/python3.11 1
+# ─── Create isolated virtualenv ───────────────────────────────────────────────
+# All pip installs go into /opt/venv — completely isolated from system packages
+RUN python3.12 -m venv /opt/venv
+
+# ─── Upgrade pip inside venv ──────────────────────────────────────────────────
+RUN pip install --upgrade pip
 
 # ─── Set Working Directory ────────────────────────────────────────────────────
 WORKDIR /app
 
 # ─── Install Python Dependencies ─────────────────────────────────────────────
 COPY requirements.txt .
-RUN python3.11 -m pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ─── Copy Application Source ──────────────────────────────────────────────────
 COPY app/ .
@@ -42,7 +45,11 @@ COPY app/ .
 COPY app/migrate.sh /migrate.sh
 RUN chmod +x /migrate.sh
 
+# ─── Symlink python3 → python3.12 for convenience inside container ────────────
+RUN ln -sf /opt/venv/bin/python /usr/local/bin/python3 \
+    && ln -sf /opt/venv/bin/python /usr/local/bin/python
+
 EXPOSE 5000
 
-# ─── Start: Run Migrations then Flask ────────────────────────────────────────
-CMD ["/bin/bash", "-c", "/migrate.sh && python3.11 -m flask run --host=0.0.0.0 --port=5000"]
+# ─── Drop into bash for interactive docker exec use ──────────────────────────
+CMD ["/bin/bash"]
