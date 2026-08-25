@@ -5,7 +5,7 @@
 #
 # Endpoints:
 #   GET  /api/employees/me        — employee views their own profile
-#   PUT  /api/employees/me        — employee edits limited fields (phone, address, picture)
+#   PUT  /api/employees/me        — employee edits their profile fields
 #   GET  /api/employees           — admin lists all employees
 #   GET  /api/employees/<id>      — admin views one employee's full profile
 #   PUT  /api/employees/<id>      — admin edits all fields of any employee
@@ -52,8 +52,9 @@ def get_employee_by_user_id(user_id):
 
 
 # Fields an employee is allowed to update on their own profile.
-# All other fields (job_title, department) require admin access.
-EMPLOYEE_EDITABLE_FIELDS = {"phone", "address", "profile_picture"}
+EMPLOYEE_EDITABLE_FIELDS = {
+    "phone", "address", "profile_picture", "job_title", "department",
+}
 
 # All fields an admin can update on any employee profile.
 ADMIN_EDITABLE_FIELDS = {"phone", "address", "profile_picture", "job_title", "department"}
@@ -108,18 +109,17 @@ def get_my_profile():
 @require_role("employee", "admin")
 def update_my_profile():
     """
-    Allows an employee to update their own limited profile fields.
+    Allows an employee to update their own profile fields.
 
-    Only these fields are writable by the employee themselves:
-        phone, address, profile_picture
-
-    Fields like job_title and department can only be changed by admin.
-    Any attempt to send those fields is silently ignored (not an error).
+    Writable fields:
+        phone, address, profile_picture, job_title, department
 
     Request body (JSON, all optional):
         phone           (str)
         address         (str)
         profile_picture (str)
+        job_title       (str)
+        department      (str)
 
     Success response (200):
         { updated employee profile }

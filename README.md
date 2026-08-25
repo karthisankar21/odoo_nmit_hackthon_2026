@@ -300,12 +300,24 @@ The backend migration script waits for PostgreSQL and applies Flask-Migrate migr
 docker compose exec backend /migrate.sh
 ```
 
-Useful migration commands:
 
+Useful migration commands:
 ```bash
 docker compose exec backend flask db current
 docker compose exec backend flask db upgrade
 docker compose exec backend flask db history
+```
+
+Before run migration manually go inside the backend docker container
+```bash
+docker compose exec -it backend /bin/bash
+```
+
+Run migrations manually:
+```bash
+flask db init
+flask db migrate -m "create tables"
+flask db upgrade
 ```
 
 If the database is reset with `docker compose down -v`, start the containers again and run the migration script.
